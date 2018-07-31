@@ -1,0 +1,6 @@
+*.tlog
+*.filters
+*.db
+*.idb
+*.ipch
+*.enc
