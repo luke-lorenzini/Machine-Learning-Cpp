@@ -10,8 +10,11 @@ public:
 	~neuron();
 
 	void fwd(std::vector<type_t> &x);
+	void fwd(concurrency::array_view<type_t, 2> &ar_x);
 	void bkwd(std::vector<type_t> &delta_in);
+	void bkwd(concurrency::array_view<type_t, 2>  &ar_delta_in);
 	void accm(std::vector<type_t> &x);
+	void accm(concurrency::array_view<type_t, 2> &ar_x);
 	void updt(int samples);
 	void set_error();
 
@@ -19,11 +22,9 @@ public:
 	std::vector<type_t>& get_delta();
 	std::vector<type_t>& get_W();
 	std::vector<type_t>& get_error();
-
-	static void matrix_sub(const std::vector<type_t> &a, const std::vector<type_t> &b, std::vector<type_t> &res, int M, int N);
 	
 private:
-	const double ALPHA = 0.8;
+	type_t alpha = 1;
 	const int COLS = 1;
 
 	std::random_device rd;
@@ -105,4 +106,5 @@ private:
 
 	void activate(int actFunct);
 	void activate_der(int actFunct);
+	void updateAlpha();
 };
