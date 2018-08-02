@@ -4,3 +4,5 @@
 *.idb
 *.ipch
 *.enc
+*.opendb
+*.csv
