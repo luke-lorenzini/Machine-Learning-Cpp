@@ -30,7 +30,7 @@ const std::vector<std::vector<type_t>> file<type_t>::parseCSV2(const std::string
 	{
 		std::stringstream lineStream(line);
 		std::string cell;
-		double val;
+		type_t val;
 		std::vector<type_t> parsedRow;
 		while (std::getline(lineStream, cell, ','))
 		{

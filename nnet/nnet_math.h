@@ -313,9 +313,7 @@ inline void nnet_math<type_t>::tanh(const std::vector<type_t> &a, std::vector<ty
 		auto row = idx[0];
 		auto col = idx[1];
 
-		ar_res[row][col] = (concurrency::precise_math::exp(ar_a[row][col]) - concurrency::precise_math::exp(-1 * ar_a[row][col])) / (concurrency::precise_math::exp(ar_a[row][col]) + concurrency::precise_math::exp(-1 * ar_a[row][col]));
-
-		//ar_res[row][col] = concurrency::precise_math::tanh(ar_a[row][col]);
+		ar_res[row][col] = concurrency::precise_math::tanh(ar_a[row][col]);
 	});
 
 	ar_res.synchronize();
@@ -329,7 +327,7 @@ inline void nnet_math<type_t>::tanh(concurrency::array_view<type_t, RANK> &ar_a,
 		auto row = idx[0];
 		auto col = idx[1];
 
-		ar_res[row][col] = (concurrency::precise_math::exp(ar_a[row][col]) - concurrency::precise_math::exp(-1 * ar_a[row][col])) / (concurrency::precise_math::exp(ar_a[row][col]) + concurrency::precise_math::exp(-1 * ar_a[row][col]));
+		ar_res[row][col] = concurrency::precise_math::tanh(ar_a[row][col]);
 	});
 }
 
