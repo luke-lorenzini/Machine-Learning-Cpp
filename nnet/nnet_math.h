@@ -22,10 +22,10 @@ public:
 	static void logistic(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
 	static void tanh(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
 	static void tanh(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
-	static void leaky_relu(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
-	static void leaky_relu(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
-	static void leaky_relu_der(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
-	static void leaky_relu_der(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
+	static void relu(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
+	static void relu(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
+	static void relu_der(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
+	static void relu_der(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
 	static void matrix_add(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res);
 	static void matrix_prod(const std::vector<type_t>& a, const std::vector<type_t>& b, std::vector<type_t>& res, int M, int N);
 	static void matrix_prod(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res);
@@ -332,7 +332,7 @@ inline void nnet_math<type_t>::tanh(concurrency::array_view<type_t, RANK> &ar_a,
 }
 
 template<class type_t>
-inline void nnet_math<type_t>::leaky_relu(const std::vector<type_t> &a, std::vector<type_t> &res, int M, int N)
+inline void nnet_math<type_t>::relu(const std::vector<type_t> &a, std::vector<type_t> &res, int M, int N)
 {
 	concurrency::array_view<const type_t, RANK> ar_a(M, N, a);
 	concurrency::array_view<type_t, RANK> ar_res(M, N, res);
@@ -345,7 +345,7 @@ inline void nnet_math<type_t>::leaky_relu(const std::vector<type_t> &a, std::vec
 
 		if (ar_a[row][col] < 0)
 		{
-			ar_res[row][col] = (type_t)0.01 * ar_a[row][col];
+			ar_res[row][col] = 0;
 		}
 		else
 		{
@@ -357,7 +357,7 @@ inline void nnet_math<type_t>::leaky_relu(const std::vector<type_t> &a, std::vec
 }
 
 template<class type_t>
-inline void nnet_math<type_t>::leaky_relu(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
+inline void nnet_math<type_t>::relu(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
@@ -366,7 +366,7 @@ inline void nnet_math<type_t>::leaky_relu(concurrency::array_view<type_t, RANK> 
 
 		if (ar_a[row][col] < 0)
 		{
-			ar_res[row][col] = (type_t)0.01 * ar_a[row][col];
+			ar_res[row][col] = 0;
 		}
 		else
 		{
@@ -376,7 +376,7 @@ inline void nnet_math<type_t>::leaky_relu(concurrency::array_view<type_t, RANK> 
 }
 
 template<class type_t>
-inline void nnet_math<type_t>::leaky_relu_der(const std::vector<type_t> &a, std::vector<type_t> &res, int M, int N)
+inline void nnet_math<type_t>::relu_der(const std::vector<type_t> &a, std::vector<type_t> &res, int M, int N)
 {
 	concurrency::array_view<const type_t, RANK> ar_a(M, N, a);
 	concurrency::array_view<type_t, RANK> ar_res(M, N, res);
@@ -389,7 +389,7 @@ inline void nnet_math<type_t>::leaky_relu_der(const std::vector<type_t> &a, std:
 
 		if (ar_a[row][col] < 0)
 		{
-			ar_res[row][col] = (type_t)0.01;
+			ar_res[row][col] = 0;
 		}
 		else
 		{
@@ -401,7 +401,7 @@ inline void nnet_math<type_t>::leaky_relu_der(const std::vector<type_t> &a, std:
 }
 
 template<class type_t>
-inline void nnet_math<type_t>::leaky_relu_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
+inline void nnet_math<type_t>::relu_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
@@ -410,7 +410,7 @@ inline void nnet_math<type_t>::leaky_relu_der(concurrency::array_view<type_t, RA
 
 		if (ar_a[row][col] < 0)
 		{
-			ar_res[row][col] = (type_t)0.01;
+			ar_res[row][col] = 0;
 		}
 		else
 		{
