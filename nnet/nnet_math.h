@@ -1,5 +1,7 @@
 #pragma once
 
+//#define SYNC
+
 template <class type_t>
 class nnet_math
 {
@@ -32,6 +34,8 @@ public:
 	static void matrix_trans(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
 	static void matrix_trans(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
 	static void logistic(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
+	static void softmax(concurrency::array_view<type_t, RANK> &ar_a, type_t sum, concurrency::array_view<type_t, RANK> &ar_res);
+	static void softmax_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res);
 };
 
 template<class type_t>
@@ -68,12 +72,16 @@ inline void nnet_math<type_t>::matrix_mult(concurrency::array_view<type_t, RANK>
 			ar_res[idx] += ar_a(row, inner) * ar_b(inner, col);
 		}
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
 inline void nnet_math<type_t>::matrix_mult_tile(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res)
 {
-	parallel_for_each(ar_res.extent.tile<RANK, RANK>(), [=](concurrency::tiled_index<RANK, RANK> tidx) restrict(amp)
+	const int LOCAL_RANK = 1;
+	parallel_for_each(ar_res.extent.tile<LOCAL_RANK, LOCAL_RANK>(), [=](concurrency::tiled_index<LOCAL_RANK, LOCAL_RANK> tidx) restrict(amp)
 	{
 		auto row = tidx.global[0];
 		auto col = tidx.global[1];
@@ -85,6 +93,9 @@ inline void nnet_math<type_t>::matrix_mult_tile(concurrency::array_view<type_t, 
 
 		ar_res[tidx] = sum;
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -134,6 +145,9 @@ inline void nnet_math<type_t>::scalar_mult(concurrency::array_view<type_t, RANK>
 
 		ar_res[row][col] = ar_a[row][col] * mult;
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -164,6 +178,9 @@ inline void nnet_math<type_t>::scalar_div(concurrency::array_view<type_t, RANK> 
 
 		ar_res[row][col] = ar_a[row][col] / div;
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -176,6 +193,9 @@ inline void nnet_math<type_t>::matrix_sub(concurrency::array_view<type_t, RANK> 
 
 		ar_res[row][col] = ar_a[row][col] - ar_b[row][col];
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -207,6 +227,9 @@ inline void nnet_math<type_t>::matrix_add(concurrency::array_view< type_t, RANK>
 
 		ar_res[row][col] = ar_a[row][col] + ar_b[row][col];
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -238,6 +261,9 @@ inline void nnet_math<type_t>::matrix_prod(concurrency::array_view<type_t, RANK>
 
 		ar_res[row][col] = ar_a[row][col] * ar_b[row][col];
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -269,6 +295,9 @@ inline void nnet_math<type_t>::matrix_trans(concurrency::array_view<type_t, RANK
 
 		ar_res[row][col] = ar_a[col][row];
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -299,6 +328,9 @@ inline void nnet_math<type_t>::logistic(concurrency::array_view<type_t, RANK> &a
 
 		ar_res[row][col] = 1 / (1 + concurrency::precise_math::exp(-1 * ar_a[row][col]));
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -329,6 +361,9 @@ inline void nnet_math<type_t>::tanh(concurrency::array_view<type_t, RANK> &ar_a,
 
 		ar_res[row][col] = concurrency::precise_math::tanh(ar_a[row][col]);
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -373,6 +408,9 @@ inline void nnet_math<type_t>::relu(concurrency::array_view<type_t, RANK> &ar_a,
 			ar_res[row][col] = ar_a[row][col];
 		}
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
 
 template<class type_t>
@@ -417,4 +455,47 @@ inline void nnet_math<type_t>::relu_der(concurrency::array_view<type_t, RANK> &a
 			ar_res[row][col] = 1;
 		}
 	});
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
+}
+
+template<class type_t>
+inline void nnet_math<type_t>::softmax(concurrency::array_view<type_t, RANK> &ar_a, type_t sum, concurrency::array_view<type_t, RANK> &ar_res)
+{	
+	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
+	{
+		auto row = idx[0];
+		auto col = idx[1];
+
+		ar_res[row][col] += ar_res[row + 1][col];
+
+		ar_res[row][col] = concurrency::precise_math::exp(ar_a[row][col]) / sum;
+	});	
+
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
+}
+
+template<class type_t>
+inline void nnet_math<type_t>::softmax_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
+{
+	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
+	{
+		auto row = idx[0];
+		auto col = idx[1];
+		type_t sum = 6.133602386;
+
+		/*for (int i = 0; i < row; ++i)
+		{
+		sum += concurrency::precise_math::exp(ar_a[row][col]);
+		}*/
+
+		//ar_res[row][col] = concurrency::precise_math::exp(ar_a[row][col]) / sum;
+	});
+
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
 }
