@@ -7,3 +7,5 @@
 *.opendb
 *.csv
 *.txt
+*.json
+*.sqlite
