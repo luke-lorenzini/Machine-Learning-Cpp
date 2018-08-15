@@ -1,6 +1,6 @@
 #pragma once
 
-//#define SYNC
+#define SYNC
 
 template <class type_t>
 class nnet_math
@@ -34,6 +34,7 @@ public:
 	static void matrix_trans(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
 	static void matrix_trans(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
 	static void logistic(const std::vector<type_t>& a, std::vector<type_t>& res, int M, int N);
+	static void exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res);
 	static void softmax(concurrency::array_view<type_t, RANK> &ar_a, type_t sum, concurrency::array_view<type_t, RANK> &ar_res);
 	static void softmax_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res);
 };
@@ -461,6 +462,22 @@ inline void nnet_math<type_t>::relu_der(concurrency::array_view<type_t, RANK> &a
 }
 
 template<class type_t>
+inline void nnet_math<type_t>::exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
+{
+	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
+	{
+		auto row = idx[0];
+		auto col = idx[1];
+
+		ar_res[row][col] = concurrency::precise_math::exp(ar_a[row][col]);
+	});
+
+#ifdef SYNC
+	ar_res.synchronize();
+#endif
+}
+
+template<class type_t>
 inline void nnet_math<type_t>::softmax(concurrency::array_view<type_t, RANK> &ar_a, type_t sum, concurrency::array_view<type_t, RANK> &ar_res)
 {	
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
@@ -468,9 +485,7 @@ inline void nnet_math<type_t>::softmax(concurrency::array_view<type_t, RANK> &ar
 		auto row = idx[0];
 		auto col = idx[1];
 
-		ar_res[row][col] += ar_res[row + 1][col];
-
-		ar_res[row][col] = concurrency::precise_math::exp(ar_a[row][col]) / sum;
+		ar_res[row][col] = ar_a[row][col] / sum;
 	});	
 
 #ifdef SYNC
