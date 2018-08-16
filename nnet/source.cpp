@@ -224,19 +224,11 @@ int main()
 			neurons[0]->accm(ar_x);
 #endif
 		}
-#ifdef _ARRAYS
 		/* Update Weights */
 		for (auto neur_it = neuron_count - 1; neur_it >= 0; --neur_it)
 		{
 			neurons[neur_it]->updt(sample_size);
 		}
-#else
-		/* Update Weights */
-		for (auto neur_it = neuron_count - 1; neur_it >= 0; --neur_it)
-		{
-			neurons[neur_it]->updt(sample_size);
-		}
-#endif
 	}
 	std::chrono::steady_clock::time_point end_time(std::chrono::steady_clock::now());
 
