@@ -8,6 +8,8 @@
 #include "relu_neuron.h"
 #include "tanh_neuron.h"
 
+#define _USE_PARALLEL
+
 typedef double type_t;
 
 #define MNIST	0
@@ -58,7 +60,9 @@ int main()
 	std::uniform_int_distribution<> distInt(0, 255);
 	std::uniform_int_distribution<> distBin(0, 1);
 
+#ifndef _USE_PARALLEL
 	gpu::getAccels();
+#endif
 
 	const auto x_rows = IN_SIZE;
 	const auto x_cols = COLS;
@@ -117,6 +121,85 @@ int main()
 
 	for (auto epochs = 0; epochs < EPOCHS; ++epochs)
 	{
+#ifdef _USE_PARALLEL
+		typedef std::pair<std::vector<type_t>, std::vector<type_t>> DataPair;
+		concurrency::concurrent_queue<DataPair> mydata;
+
+		for (auto i = 0; i < sample_size; ++i)
+		{
+#if CLASS_DATA
+			std::vector<type_t>::const_iterator first = data[i].begin();
+			std::vector<type_t>::const_iterator last = data[i].end() - 1;
+#else
+			std::vector<type_t>::const_iterator first = data[i].begin() + 1;
+			std::vector<type_t>::const_iterator last = data[i].end();
+#endif
+			std::vector<type_t> x(first, last);
+
+			mydata.push(DataPair(x, one_hot[data[i][CLASS_DATA]]));
+		}
+
+		std::vector<concurrency::accelerator> accels = concurrency::accelerator::get_all();
+		concurrency::parallel_for(0, int(accels.size()), [=, &mydata, &total_error](const unsigned i)
+		{
+			//auto taskCount = 0;
+
+			DataPair dp;
+			while (mydata.try_pop(dp))
+			{
+				concurrency::array_view<type_t, 2> test_x(x_rows, x_cols, dp.first);
+				concurrency::array_view<type_t, 2> test_t(t_rows, t_cols, dp.second);
+
+				/* Forward Propogation Step */
+				neurons[0]->fwd(test_x);
+				for (auto neur_it = 1; neur_it < neuron_count; ++neur_it)
+				{
+					neurons[neur_it]->fwd(neurons[neur_it - 1]->get_ar_y());
+				}
+
+				/* Error */
+				//nnet_math<type_t>::matrix_sub(neurons[neuron_count - 1]->get_ar_y(), ar_t, ar_error_out);
+				if ((epochs % ((EPOCHS) / 10) == 0) && (i == 0))
+				{
+					auto val = 100 * epochs / (double)EPOCHS;
+					ar_error_out.synchronize();
+
+					for (int e = 0; e < error_out_rows; ++e)
+					{
+						error_den += abs(error_out[e]);
+					}
+
+					total_error = error_den / OUTPUT_CLASSES;
+
+					//std::cout << "Progress:" << val << "%	Error:" << total_error << std::endl;
+
+					error_den = 0;
+				}
+
+				/* Back Propogation Step */
+				//neurons[neuron_count - 1]->bkwd(ar_error_out);
+				neurons[neuron_count - 1]->set_error();
+				for (auto neur_it = neuron_count - 2; neur_it >= 0; --neur_it)
+				{
+					neurons[neur_it]->bkwd(neurons[neur_it + 1]->get_ar_error());
+					neurons[neur_it]->set_error();
+				}
+
+				/* Accumulate Error Step */
+				for (auto neur_it = neuron_count - 1; neur_it > 0; --neur_it)
+				{
+					neurons[neur_it]->accm(neurons[neur_it - 1]->get_ar_y());
+				}
+				neurons[0]->accm(test_x);
+
+				//taskCount++;
+			}
+
+			accels[i].default_view.wait();
+
+			//std::wcout << " Finished " << taskCount << " tasks on " << i << std::endl;
+		});
+#else
 		for (auto samples = 0; samples < sample_size; ++samples)
 		{
 #if CLASS_DATA
@@ -224,6 +307,7 @@ int main()
 			neurons[0]->accm(ar_x);
 #endif
 		}
+#endif
 		/* Update Weights */
 		for (auto neur_it = neuron_count - 1; neur_it >= 0; --neur_it)
 		{
