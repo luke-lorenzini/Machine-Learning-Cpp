@@ -9,12 +9,10 @@ public:
 	tanh_neuron(int input, int output);
 	~tanh_neuron();
 
-#ifndef _ARRAYS
 protected:
 	void activate();
 	void activate_der();
 	void init_rand_real(int size, std::vector<type_t> &vect);
-#endif
 };
 
 template <class type_t>
@@ -28,7 +26,6 @@ tanh_neuron<type_t>::~tanh_neuron()
 {
 }
 
-#ifndef _ARRAYS
 template <class type_t>
 void tanh_neuron<type_t>::activate()
 {
@@ -63,4 +60,3 @@ void tanh_neuron<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
 		vect.push_back(distReal(gen));
 	}
 }
-#endif

@@ -9,11 +9,9 @@ public:
 	softmax_neuron(int input, int output);
 	~softmax_neuron();
 
-#ifndef _ARRAYS
 protected:
 	void activate();
 	void activate_der();
-#endif
 };
 
 template <class type_t>
@@ -27,7 +25,6 @@ softmax_neuron<type_t>::~softmax_neuron()
 {
 }
 
-#ifndef _ARRAYS
 template <class type_t>
 void softmax_neuron<type_t>::activate()
 {
@@ -45,4 +42,3 @@ void softmax_neuron<type_t>::activate_der()
 
 	nnet_math<type_t>::matrix_prod(ar_y, ar_t_y, ar_t_e0);
 }
-#endif

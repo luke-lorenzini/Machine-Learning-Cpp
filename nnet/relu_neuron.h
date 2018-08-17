@@ -9,12 +9,10 @@ public:
 	relu_neuron(int input, int output);
 	~relu_neuron();
 
-#ifndef _ARRAYS
 protected:
 	void activate();
 	void activate_der();
 	void init_rand_real(int size, std::vector<type_t> &vect);
-#endif
 };
 
 template <class type_t>
@@ -28,7 +26,6 @@ relu_neuron<type_t>::~relu_neuron()
 {
 }
 
-#ifndef _ARRAYS
 template <class type_t>
 void relu_neuron<type_t>::activate()
 {
@@ -61,4 +58,3 @@ void relu_neuron<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
 		vect.push_back(distReal(gen));
 	}
 }
-#endif

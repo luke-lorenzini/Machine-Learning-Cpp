@@ -210,55 +210,7 @@ int main()
 			std::vector<type_t>::const_iterator last = data[samples].end();
 #endif
 			std::vector<type_t> x(first, last);
-#ifdef _ARRAYS			
-			concurrency::array_view<type_t, 2> ar_x(x_rows, x_cols, x);
 
-			/* Forward Propogation Step */
-			neurons[0]->fwd(x);
-			for (auto neur_it = 1; neur_it < neuron_count; ++neur_it)
-			{
-				neurons[neur_it]->fwd(neurons[neur_it - 1]->get_y());
-			}
-
-			t = one_hot[data[samples][CLASS_DATA]];
-			concurrency::array_view<type_t, 2> ar_t(t_rows, t_cols, t);
-
-			/* Error */
-			nnet_math<type_t>::matrix_sub(neuron_out.get_y(), t, error_out, error_out_rows, error_out_cols);
-			if ((epochs % ((EPOCHS) / 10) == 0) && (samples == 0))
-			{
-				auto val = 100 * epochs / (double)EPOCHS;
-				ar_error_out.synchronize();
-
-				for (int e = 0; e < error_out_rows; ++e)
-				{
-					error_den += abs(error_out[e]);
-				}
-
-				total_error = error_den / OUTPUT_CLASSES;
-
-				std::cout << "Progress:" << val << "%	Error:" << total_error << std::endl;
-
-				error_den = 0;
-			}
-
-			/* Back Propogation Step */
-			neurons[neuron_count - 1]->bkwd(error_out);
-			neurons[neuron_count - 1]->set_error();
-			for (auto neur_it = neuron_count - 2; neur_it >= 0; --neur_it)
-			{
-				neurons[neur_it]->bkwd(neurons[neur_it + 1]->get_error());
-				neurons[neur_it]->set_error();
-			}
-
-			/* Accumulate Error Step */
-			for (auto neur_it = neuron_count - 1; neur_it > 0; --neur_it)
-			{
-				neurons[neur_it]->accm(neurons[neur_it - 1]->get_y());
-			}
-			neurons[0]->accm(x);
-
-#else
 			concurrency::array_view<type_t, 2> ar_x(x_rows, x_cols, x);
 
 			/* Forward Propogation Step */
@@ -305,7 +257,6 @@ int main()
 				neurons[neur_it]->accm(neurons[neur_it-1]->get_ar_y());
 			}
 			neurons[0]->accm(ar_x);
-#endif
 		}
 #endif
 		/* Update Weights */
