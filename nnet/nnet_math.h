@@ -1,6 +1,7 @@
 #pragma once
 
 #define SYNC
+//#define DISCARD
 
 template <class type_t>
 class nnet_math
@@ -63,6 +64,10 @@ inline void nnet_math<type_t>::matrix_mult(const std::vector<type_t>& a, const s
 template<class type_t>
 inline void nnet_math<type_t>::matrix_mult(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
+
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -82,6 +87,10 @@ template<class type_t>
 inline void nnet_math<type_t>::matrix_mult_tile(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res)
 {
 	const int LOCAL_RANK = 1;
+
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent.tile<LOCAL_RANK, LOCAL_RANK>(), [=](concurrency::tiled_index<LOCAL_RANK, LOCAL_RANK> tidx) restrict(amp)
 	{
 		auto row = tidx.global[0];
@@ -139,6 +148,9 @@ inline void nnet_math<type_t>::scalar_mult(const std::vector<type_t> &a, type_t 
 template<class type_t>
 inline void nnet_math<type_t>::scalar_mult(concurrency::array_view<type_t, RANK> &ar_a, type_t mult, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -172,6 +184,9 @@ inline void nnet_math<type_t>::scalar_div(const std::vector<type_t> &a, type_t d
 template<class type_t>
 inline void nnet_math<type_t>::scalar_div(concurrency::array_view<type_t, RANK> &ar_a, type_t div, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -187,6 +202,9 @@ inline void nnet_math<type_t>::scalar_div(concurrency::array_view<type_t, RANK> 
 template<class type_t>
 inline void nnet_math<type_t>::matrix_sub(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_b, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -221,6 +239,9 @@ inline void nnet_math<type_t>::matrix_add(const std::vector<type_t> &a, const st
 template<class type_t>
 inline void nnet_math<type_t>::matrix_add(concurrency::array_view< type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_b, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -255,6 +276,9 @@ inline void nnet_math<type_t>::matrix_prod(const std::vector<type_t> &a, const s
 template<class type_t>
 inline void nnet_math<type_t>::matrix_prod(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_b, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -289,6 +313,9 @@ inline void nnet_math<type_t>::matrix_trans(const std::vector<type_t> &a, std::v
 template<class type_t>
 inline void nnet_math<type_t>::matrix_trans(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -322,6 +349,9 @@ inline void nnet_math<type_t>::logistic(const std::vector<type_t> &a, std::vecto
 template<class type_t>
 inline void nnet_math<type_t>::logistic(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -355,6 +385,9 @@ inline void nnet_math<type_t>::tanh(const std::vector<type_t> &a, std::vector<ty
 template<class type_t>
 inline void nnet_math<type_t>::tanh(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -395,6 +428,9 @@ inline void nnet_math<type_t>::relu(const std::vector<type_t> &a, std::vector<ty
 template<class type_t>
 inline void nnet_math<type_t>::relu(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -442,6 +478,9 @@ inline void nnet_math<type_t>::relu_der(const std::vector<type_t> &a, std::vecto
 template<class type_t>
 inline void nnet_math<type_t>::relu_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -464,6 +503,9 @@ inline void nnet_math<type_t>::relu_der(concurrency::array_view<type_t, RANK> &a
 template<class type_t>
 inline void nnet_math<type_t>::exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -479,7 +521,10 @@ inline void nnet_math<type_t>::exponent(concurrency::array_view<type_t, RANK> &a
 
 template<class type_t>
 inline void nnet_math<type_t>::softmax(concurrency::array_view<type_t, RANK> &ar_a, type_t sum, concurrency::array_view<type_t, RANK> &ar_res)
-{	
+{
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
@@ -496,6 +541,9 @@ inline void nnet_math<type_t>::softmax(concurrency::array_view<type_t, RANK> &ar
 template<class type_t>
 inline void nnet_math<type_t>::softmax_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
 {
+#ifdef DISCARD
+	ar_res.discard_data();
+#endif
 	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
 	{
 		auto row = idx[0];
