@@ -7,7 +7,7 @@ public:
 	file();
 	~file();
 
-	static const std::vector<std::vector<type_t>> parseCSV2(const std::string FN);
+	static const std::vector<std::vector<type_t>> parseCSV(const std::string FN);
 };
 
 template<class type_t>
@@ -21,9 +21,9 @@ inline file<type_t>::~file()
 }
 
 template<class type_t>
-const std::vector<std::vector<type_t>> file<type_t>::parseCSV2(const std::string FN)
+const std::vector<std::vector<type_t>> file<type_t>::parseCSV(const std::string FILENAME)
 {
-	std::ifstream  data(FN);
+	std::ifstream  data(FILENAME);
 	std::string line;
 	std::vector<std::vector<type_t>> parsedCsv;
 	while (std::getline(data, line))
