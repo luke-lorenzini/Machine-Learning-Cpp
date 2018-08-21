@@ -67,6 +67,7 @@ inline void nnet_math<type_t>::matrix_mult_tile(concurrency::array_view<type_t, 
 		for (auto inner = 0; inner < RANK; inner++)
 		{
 			sum += ar_a(row, inner) * ar_b(inner, col);
+			//ar_res[tidx] += ar_a(row, inner) * ar_b(inner, col);
 		}
 
 		ar_res[tidx] = sum;
