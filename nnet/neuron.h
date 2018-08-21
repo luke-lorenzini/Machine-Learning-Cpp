@@ -2,6 +2,8 @@
 
 #define _USE_FIXED_RAND
 
+//#define _USE_TILES
+
 template <class type_t>
 class neuron
 {
@@ -202,7 +204,11 @@ neuron<type_t>::~neuron()
 template <class type_t>
 void neuron<type_t>::fwd(concurrency::array_view<type_t, RANK> &ar_x)
 {
+#ifdef _USE_TILES
+	nnet_math<type_t>::matrix_mult_tile(ar_W, ar_x, ar_z);
+#else
 	nnet_math<type_t>::matrix_mult(ar_W, ar_x, ar_z);
+#endif
 
 	activate();
 }
@@ -219,8 +225,11 @@ template <class type_t>
 void neuron<type_t>::accm(concurrency::array_view<type_t, RANK> &ar_x)
 {
 	nnet_math<type_t>::matrix_trans(ar_x, ar_t_x);
-
+#ifdef _USE_TILES
+	nnet_math<type_t>::matrix_mult_tile(ar_delta, ar_t_x, ar_t_delta_out);
+#else
 	nnet_math<type_t>::matrix_mult(ar_delta, ar_t_x, ar_t_delta_out);
+#endif
 
 	nnet_math<type_t>::matrix_add(ar_t_delta_out, ar_delta_W, ar_delta_W);
 }
@@ -240,7 +249,11 @@ template <class type_t>
 void neuron<type_t>::set_error()
 {
 	nnet_math<type_t>::matrix_trans(ar_W, ar_W_Trans);
+#ifdef _USE_TILES
+	nnet_math<type_t>::matrix_mult_tile(ar_W_Trans, ar_delta, ar_error);
+#else
 	nnet_math<type_t>::matrix_mult(ar_W_Trans, ar_delta, ar_error);
+#endif
 }
 
 template <class type_t>
