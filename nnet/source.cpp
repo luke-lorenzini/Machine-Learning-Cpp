@@ -30,7 +30,10 @@ int main()
 	const static auto EPOCHS = 10;
 
 	/* Vector of data */
-	std::vector<std::vector<type_t>> data = file<type_t>::parseCSV2(FILENAME);
+	std::vector<std::vector<type_t>> data = file<type_t>::parseCSV(FILENAME);
+
+	/* Ensure size > 0 */
+	static auto sample_size = (data.size() < 0) ? 0 : signed(data.size());
 
 	const auto one_hot_size = OUTPUT_CLASSES;
 	std::vector<std::vector<type_t>> one_hot;
@@ -52,23 +55,50 @@ int main()
 		}
 		one_hot.push_back(one_hot_row);
 	}
+
+	std::vector<std::vector<type_t>> x;
+	std::vector<std::vector<type_t>> t;
+
+	for (auto samples = 0; samples < sample_size; ++samples)
+	{
+#if CLASS_DATA
+		std::vector<type_t>::const_iterator first = data[samples].begin();
+		std::vector<type_t>::const_iterator last = data[samples].end() - 1;
+		std::vector<type_t>::const_iterator soln = data[samples].end();
+#else
+		std::vector<type_t>::const_iterator first = data[samples].begin() + 1;
+		std::vector<type_t>::const_iterator last = data[samples].end();
+		std::vector<type_t>::const_iterator soln = data[samples].begin();
+#endif
+
+		std::vector<type_t> temp_x(first, last);
+
+		x.push_back(temp_x);
+		t.push_back(one_hot[data[samples][CLASS_DATA]]);
+	}
 	
 	/* Input Parameters */
-	nnet::input_parms myData;
-	myData.data_rows = DATA_ROWS;
-	myData.data_cols = DATA_COLS;
-	myData.output_classes = OUTPUT_CLASSES;
-	myData.filename = FILENAME;
-	myData.layer_mult = LAYER_MULT;
-	myData.in_size = IN_SIZE;
-	myData.out_size = OUT_SIZE;
-	myData.cols = COLS;
+	nnet::input_parms myParms;
+	myParms.data_rows = DATA_ROWS;
+	myParms.data_cols = DATA_COLS;
+	myParms.output_classes = OUTPUT_CLASSES;
+	myParms.layer_mult = LAYER_MULT;
+	myParms.in_size = IN_SIZE;
+	myParms.out_size = OUT_SIZE;
+	myParms.cols = COLS;
+	myParms.epochs = EPOCHS;
+
+	/* Input Data */
+	nnet::input_data myData2;
+	myData2.x = x;
+	myData2.t = t;
+	myData2.size = sample_size;
 
 	/* Create the nnet object */
-	nnet id(myData);
+	nnet id(myParms);
 
 	/* Run the thing */
-	id.run(EPOCHS, data, one_hot);
+	id.run(myData2);
 
 	/* Wait for some input */
 	getchar();
