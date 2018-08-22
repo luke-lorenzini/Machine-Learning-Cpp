@@ -61,7 +61,7 @@ void softmax_neuron<type_t>::activate_der()
 	}
 
 	// Jacobian * dy (derrivative of cost function)
-	concurrency::array_view<type_t, RANK> ar_Jacobian(3, 3, Jacobian);
+	concurrency::array_view<type_t, RANK> ar_Jacobian(ar_y.extent[0], ar_y.extent[0], Jacobian);
 
 #ifdef _USE_TILES
 	nnet_math<type_t>::matrix_mult_tile(ar_Jacobian, ar_y, ar_t_e0);
