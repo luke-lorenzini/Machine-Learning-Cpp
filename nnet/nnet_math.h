@@ -26,7 +26,6 @@ public:
 	static void matrix_trans(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
 	static void exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res);
 	static void softmax(concurrency::array_view<type_t, RANK> &ar_a, type_t sum, concurrency::array_view<type_t, RANK> &ar_res);
-	static void softmax_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res);
 };
 
 template<class type_t>
@@ -309,27 +308,3 @@ inline void nnet_math<type_t>::softmax(concurrency::array_view<type_t, RANK> &ar
 #endif
 }
 
-template<class type_t>
-inline void nnet_math<type_t>::softmax_der(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
-{
-#ifdef DISCARD
-	ar_res.discard_data();
-#endif
-	parallel_for_each(ar_res.extent, [=](concurrency::index<RANK> idx) restrict(amp)
-	{
-		auto row = idx[0];
-		auto col = idx[1];
-		type_t sum = 6.133602386;
-
-		/*for (int i = 0; i < row; ++i)
-		{
-		sum += concurrency::precise_math::exp(ar_a[row][col]);
-		}*/
-
-		//ar_res[row][col] = concurrency::precise_math::exp(ar_a[row][col]) / sum;
-	});
-
-#ifdef SYNC
-	ar_res.synchronize();
-#endif
-}
