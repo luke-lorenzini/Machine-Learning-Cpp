@@ -13,10 +13,7 @@
 
 nnet::nnet(input_parms& parms)
 {
-	DATA_ROWS = parms.data_rows;
-	DATA_COLS = parms.data_cols;
 	OUTPUT_CLASSES = parms.output_classes;
-	LAYER_MULT = parms.layer_mult;
 	IN_SIZE = parms.in_size;
 	OUT_SIZE = parms.out_size;
 	COLS = parms.cols;

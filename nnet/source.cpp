@@ -79,10 +79,7 @@ int main()
 	
 	/* Input Parameters */
 	nnet::input_parms myParms;
-	myParms.data_rows = DATA_ROWS;
-	myParms.data_cols = DATA_COLS;
 	myParms.output_classes = OUTPUT_CLASSES;
-	myParms.layer_mult = LAYER_MULT;
 	myParms.in_size = IN_SIZE;
 	myParms.out_size = OUT_SIZE;
 	myParms.cols = COLS;
