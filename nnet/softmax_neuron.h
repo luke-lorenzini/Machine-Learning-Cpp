@@ -28,11 +28,14 @@ softmax_neuron<type_t>::~softmax_neuron()
 template <class type_t>
 void softmax_neuron<type_t>::activate()
 {
-	nnet_math<type_t>::exponent(ar_z, ar_t_y);
+	auto maxi = std::max_element(std::begin(t_y), std::end(t_y));
+	type_t mmm = *maxi;
+
+	nnet_math<type_t>::exponent(ar_z, ar_t_y, -mmm);
 
 	type_t sum = concurrency::parallel_reduce(begin(t_y), end(t_y), 0, std::plus<type_t>());
 
-	nnet_math<type_t>::softmax(ar_t_y, sum, ar_y);
+	nnet_math<type_t>::softmax(ar_t_y, (sum + 0.00001), ar_y);
 }
 
 template <class type_t>

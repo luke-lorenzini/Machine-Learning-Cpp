@@ -24,7 +24,7 @@ public:
 	static void matrix_add(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res);
 	static void matrix_prod(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res);
 	static void matrix_trans(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_res);
-	static void exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res);
+	static void exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res, type_t sum);
 	static void softmax(concurrency::array_view<type_t, RANK> &ar_a, type_t sum, concurrency::array_view<type_t, RANK> &ar_res);
 };
 
@@ -271,7 +271,7 @@ inline void nnet_math<type_t>::relu_der(concurrency::array_view<type_t, RANK> &a
 }
 
 template<class type_t>
-inline void nnet_math<type_t>::exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res)
+inline void nnet_math<type_t>::exponent(concurrency::array_view<type_t, RANK> &ar_a, concurrency::array_view<type_t, RANK> &ar_res, type_t sum)
 {
 #ifdef DISCARD
 	ar_res.discard_data();
@@ -281,7 +281,7 @@ inline void nnet_math<type_t>::exponent(concurrency::array_view<type_t, RANK> &a
 		auto row = idx[0];
 		auto col = idx[1];
 
-		ar_res[row][col] = concurrency::precise_math::exp(ar_a[row][col]);
+		ar_res[row][col] = concurrency::precise_math::exp(ar_a[row][col] + sum);
 	});
 
 #ifdef SYNC
