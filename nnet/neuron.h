@@ -18,13 +18,19 @@ public:
 	void bkwd(concurrency::array_view<type_t, RANK> &ar_delta_in);
 	void accm(concurrency::array_view<type_t, RANK> &ar_x);
 
-	concurrency::array_view<type_t, 2>& get_ar_y();
-	concurrency::array_view<type_t, 2>& get_ar_delta();
-	concurrency::array_view<type_t, 2>& get_ar_W();
-	concurrency::array_view<type_t, 2>& get_ar_error();
+	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_y();
+	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_delta();
+	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_W();
+	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_error();
+	concurrency::array_view<type_t, neuron<type_t>::RANK>& get_softmax_err();
 
 	void updt(int samples);
 	void set_error();
+
+	void softmax();
+	void softmax_der();
+
+	void check(concurrency::array_view<type_t, RANK> &ar_x);
 
 protected:
 	type_t alpha = 1;
@@ -257,27 +263,90 @@ void neuron<type_t>::set_error()
 }
 
 template <class type_t>
-concurrency::array_view<type_t, 2>& neuron<type_t>::get_ar_y()
+void neuron<type_t>::softmax()
+{
+	nnet_math<type_t>::exponent(ar_z, ar_t_y);
+
+	type_t sum = concurrency::parallel_reduce(begin(t_y), end(t_y), 0, std::plus<type_t>());
+
+	nnet_math<type_t>::softmax(ar_t_y, sum, ar_y);
+}
+
+template <class type_t>
+void neuron<type_t>::softmax_der()
+{
+	/*
+	https://stackoverflow.com/questions/33541930/how-to-implement-the-softmax-derivative-independently-from-any-loss-function
+	https://stats.stackexchange.com/questions/79454/softmax-layer-in-a-neural-network
+	*/
+	std::vector<type_t> Jacobian;
+
+	// Jacobian
+	for (auto i = 0; i < ar_y.extent[0]; ++i)
+	{
+		for (auto j = 0; j < ar_y.extent[0]; ++j)
+		{
+			if (i == j)
+			{
+				Jacobian.push_back(y[i] * (1 - y[i]));
+			}
+			else
+			{
+				Jacobian.push_back(-y[i] * y[j]);
+			}
+		}
+	}
+
+	// Jacobian * dy (derrivative of cost function)
+	concurrency::array_view<type_t, RANK> ar_Jacobian(ar_y.extent[0], ar_y.extent[0], Jacobian);
+
+#ifdef _USE_TILES
+	nnet_math<type_t>::matrix_mult_tile(ar_Jacobian, ar_y, ar_t_e0);
+#else
+	nnet_math<type_t>::matrix_mult(ar_Jacobian, ar_y, ar_t_e0);
+#endif
+}
+
+template <class type_t>
+void neuron<type_t>::check(concurrency::array_view<type_t, RANK> &ar_x)
+{
+#ifdef _USE_TILES
+	nnet_math<type_t>::matrix_mult_tile(ar_W, ar_x, ar_z);
+#else
+	nnet_math<type_t>::matrix_mult(ar_W, ar_x, ar_z);
+#endif
+
+	activate();
+}
+
+template <class type_t>
+concurrency::array_view<type_t, neuron<type_t>::RANK> &neuron<type_t>::get_ar_y()
 {
 	return ar_y;
 }
 
 template <class type_t>
-concurrency::array_view<type_t, 2>& neuron<type_t>::get_ar_delta()
+concurrency::array_view<type_t, neuron<type_t>::RANK> &neuron<type_t>::get_ar_delta()
 {
 	return ar_delta;
 }
 
 template <class type_t>
-concurrency::array_view<type_t, 2>& neuron<type_t>::get_ar_W()
+concurrency::array_view<type_t, neuron<type_t>::RANK> &neuron<type_t>::get_ar_W()
 {
 	return ar_W;
 }
 
 template <class type_t>
-concurrency::array_view<type_t, 2>& neuron<type_t>::get_ar_error()
+concurrency::array_view<type_t, neuron<type_t>::RANK> &neuron<type_t>::get_ar_error()
 {
 	return ar_error;
+}
+
+template <class type_t>
+concurrency::array_view<type_t, neuron<type_t>::RANK> &neuron<type_t>::get_softmax_err()
+{
+	return ar_t_e0;
 }
 
 template<class type_t>
