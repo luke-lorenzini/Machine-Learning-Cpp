@@ -100,6 +100,9 @@ int main()
 	/* Run the thing */
 	id.run(myData2);
 
+	/* Verify the thing */
+	//id.verify(myData2);
+
 	/* Wait for some input */
 	getchar();
 }
