@@ -1,4 +1,5 @@
 #pragma once
+#include "neuron.h"
 
 typedef double type_t;
 
@@ -26,6 +27,7 @@ public:
 	~nnet();
 
 	void run(input_data& data);
+	void verify(input_data& data);
 
 private:
 	int DATA_ROWS;
@@ -36,5 +38,15 @@ private:
 	int OUT_SIZE;
 	int COLS;
 	int EPOCHS;
+
+	int x_rows = IN_SIZE;
+	int x_cols = COLS;
+	int error_out_rows = OUTPUT_CLASSES;
+	int error_out_cols = COLS;
+	int error_out_size = error_out_rows * error_out_cols;
+	int t_rows = OUTPUT_CLASSES;
+	int t_cols = COLS;
+
+	std::vector<neuron<type_t>*> neurons;
 };
 
