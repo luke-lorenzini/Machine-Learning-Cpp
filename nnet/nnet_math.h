@@ -1,7 +1,7 @@
 #pragma once
 
-#define SYNC
 //#define DISCARD
+#define SYNC
 
 template <class type_t>
 class nnet_math
