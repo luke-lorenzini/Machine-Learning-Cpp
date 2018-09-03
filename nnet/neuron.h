@@ -1,3 +1,7 @@
+// Copyright (c) 2018 Luke Lorenzini, https://www.zinisolutions.com/
+// This file is licensed under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 #pragma once
 
 #define _USE_FIXED_RAND
@@ -22,7 +26,7 @@ public:
 	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_delta();
 	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_W();
 	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_error();
-	concurrency::array_view<type_t, neuron<type_t>::RANK>& get_softmax_err();
+	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_softmax_err();
 
 	void updt(int samples);
 	void set_error();

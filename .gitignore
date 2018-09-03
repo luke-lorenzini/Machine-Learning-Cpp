@@ -9,3 +9,5 @@
 *.txt
 *.json
 *.sqlite
+*.xml
+*.lastcodeanalysissucceeded
