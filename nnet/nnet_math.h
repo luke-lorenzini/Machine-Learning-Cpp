@@ -1,3 +1,7 @@
+// Copyright (c) 2018 Luke Lorenzini, https://www.zinisolutions.com/
+// This file is licensed under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 #pragma once
 
 //#define DISCARD
