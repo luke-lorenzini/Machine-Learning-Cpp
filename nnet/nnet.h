@@ -24,11 +24,12 @@ public:
 		int size;
 	};
 
-	nnet(input_parms& parms);
+	nnet(input_parms &parms);
 	~nnet();
 
-	void run(input_data& data);
-	void verify(input_data& data);
+	void run_sequential(input_data &data);
+	void run_parallel(input_data &data);
+	void verify(input_data &data);
 
 private:
 	int OUTPUT_CLASSES;

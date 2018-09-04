@@ -95,7 +95,7 @@ int main()
 	nnet id(myParms);
 
 	/* Run the thing */
-	id.run(myData2);
+	id.run_sequential(myData2);
 
 	/* Verify the thing */
 	//id.verify(myData2);
