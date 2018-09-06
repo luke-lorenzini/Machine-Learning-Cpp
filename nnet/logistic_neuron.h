@@ -14,8 +14,8 @@ public:
 	~logistic_neuron();
 
 protected:
-	void activate();
-	void activate_der();
+	void activate() override;
+	void activate_der() override;
 	void init_rand_real(int size, std::vector<type_t> &vect);
 };
 

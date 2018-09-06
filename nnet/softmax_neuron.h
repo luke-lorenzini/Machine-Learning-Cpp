@@ -14,8 +14,8 @@ public:
 	~softmax_neuron();
 
 protected:
-	void activate();
-	void activate_der();
+	void activate() override;
+	void activate_der() override;
 };
 
 template <class type_t>
