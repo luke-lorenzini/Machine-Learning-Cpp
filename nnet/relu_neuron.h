@@ -39,7 +39,7 @@ void relu_neuron<type_t>::activate()
 template <class type_t>
 void relu_neuron<type_t>::activate_der()
 {
-	nnet_math<type_t>::relu_der(ar_z, ar_y);
+	nnet_math<type_t>::relu_der(ar_z, ar_t_e0);
 }
 
 template <class type_t>
