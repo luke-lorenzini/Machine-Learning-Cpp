@@ -43,11 +43,14 @@ inline void nnet_math<type_t>::matrix_mult(concurrency::array_view<type_t, RANK>
 	{
 		auto row = idx[0];
 		auto col = idx[1];
+		type_t sum = 0.0;
 
-		for (auto inner = 0; inner < RANK; inner++)
+		for (auto inner = 0; inner < ar_a.extent[1]; inner++)
 		{
-			ar_res[idx] += ar_a(row, inner) * ar_b(inner, col);
+			sum += ar_a(row, inner) * ar_b(inner, col);
+			//ar_res[idx] += ar_a(row, inner) * ar_b(inner, col);
 		}
+		ar_res[idx] = sum;
 	});
 #ifdef SYNC
 	ar_res.synchronize();
