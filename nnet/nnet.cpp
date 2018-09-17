@@ -15,7 +15,7 @@
 //#define _USE_PARALLEL
 //#define _USE_SOFTMAX
 
-nnet::nnet(input_parms& parms)
+	nnet::nnet(input_parms &parms)
 {
 	OUTPUT_CLASSES = parms.output_classes;
 	IN_SIZE = parms.in_size;
@@ -36,7 +36,7 @@ nnet::~nnet()
 {
 }
 
-void nnet::run_sequential(input_data& data)
+void nnet::run_sequential(input_data &data)
 {
 	auto error_den = 1.0;
 	auto total_error = 1.0;
@@ -50,8 +50,8 @@ void nnet::run_sequential(input_data& data)
 
 	logistic_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
 	//logistic_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
-	//logistic_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
-	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
+	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
+	logistic_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
 
 	neurons.push_back(&neuron_in);
 	//neurons.push_back(&neuron_int0);
@@ -204,7 +204,6 @@ void nnet::run_sequential(input_data& data)
 
 	std::cout << std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count() << std::endl;
 
-
 	/* Verify */
 	const auto CHECK0 = 0;
 	const auto CHECK1 = 50;
@@ -252,7 +251,7 @@ void nnet::run_parallel(input_data &data)
 	logistic_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
 	//logistic_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
 	//logistic_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
-	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
+	logistic_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
 
 	neurons.push_back(&neuron_in);
 	//neurons.push_back(&neuron_int0);
