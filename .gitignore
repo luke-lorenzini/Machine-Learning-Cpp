@@ -11,3 +11,7 @@
 *.sqlite
 *.xml
 *.lastcodeanalysissucceeded
+/x64/Debug
+/nnet/x64/Debug
+/.vs/nnet
+*.user
