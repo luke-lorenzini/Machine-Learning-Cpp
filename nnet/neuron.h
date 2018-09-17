@@ -150,7 +150,7 @@ neuron<type_t>::neuron(int input, int output) :
 	ar_error(output, COLS, error),
 	ar_z(input, COLS, z),
 	ar_t_e0(input, COLS, t_e0),
-	ar_t_x(output, COLS, t_x),
+	ar_t_x(COLS, output, t_x),
 	ar_t_delta_out(input, output, t_delta_out),
 	ar_delta_W(input, output, delta_W),
 	ar_t_delta_W(input, output, t_delta_W),
