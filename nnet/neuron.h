@@ -37,7 +37,7 @@ public:
 	void check(concurrency::array_view<type_t, RANK> &ar_x);
 
 protected:
-	type_t alpha = 1;
+	type_t alpha = 0.2;
 	const int COLS = 1;
 
 	std::random_device rd;
@@ -114,7 +114,7 @@ protected:
 
 	virtual void activate() = 0;
 	virtual void activate_der() = 0;
-	
+
 	void init_rand(int size, std::vector<type_t> &vect);
 	void updateAlpha();
 };
@@ -123,8 +123,8 @@ template <class type_t>
 void neuron<type_t>::updateAlpha()
 {
 	const auto CONST1 = 1;
-	const auto CONST2 = 1;
-	
+	const auto CONST2 = 5;
+
 	alpha = CONST1 / (alpha + CONST2);
 }
 
