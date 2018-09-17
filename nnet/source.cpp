@@ -94,8 +94,11 @@ int main()
 	/* Create the nnet object */
 	nnet id(myParms);
 
-	/* Run the thing */
+	/* Run the thing in sequential mode */
 	id.run_sequential(myData2);
+
+	/* Run the thing in parallel mode */
+	//id.run_parallel(myData2);
 
 	/* Verify the thing */
 	//id.verify(myData2);
