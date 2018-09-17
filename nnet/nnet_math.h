@@ -60,27 +60,39 @@ inline void nnet_math<type_t>::matrix_mult(concurrency::array_view<type_t, RANK>
 template<class type_t>
 inline void nnet_math<type_t>::matrix_mult_tile(concurrency::array_view<type_t, RANK>& ar_a, concurrency::array_view<type_t, RANK>& ar_b, concurrency::array_view<type_t, RANK>& ar_res)
 {
-	const int LOCAL_RANK = 1;
+	static const int TileSize = 1;
 
 #ifdef DISCARD
 	ar_res.discard_data();
 #endif
-	parallel_for_each(ar_res.extent.tile<LOCAL_RANK, LOCAL_RANK>(), [=](concurrency::tiled_index<LOCAL_RANK, LOCAL_RANK> tidx) restrict(amp)
+	parallel_for_each(ar_res.extent.tile<TileSize, TileSize>(), [=](concurrency::tiled_index<TileSize, TileSize> tidx) restrict(amp)
 	{
 		auto row = tidx.global[0];
 		auto col = tidx.global[1];
 		type_t sum = 0.0;
-		for (auto inner = 0; inner < RANK; inner++)
+
+		for (auto i = 0; i < ar_a.extent[1]; i += TileSize)
 		{
-			sum += ar_a(row, inner) * ar_b(inner, col);
-			//ar_res[tidx] += ar_a(row, inner) * ar_b(inner, col);
+			tile_static type_t sA[TileSize][TileSize];
+			tile_static type_t sB[TileSize][TileSize];
+			sA[row][col] = ar_a(tidx.global[0], col + i);
+			sB[row][col] = ar_b(row + i, tidx.global[1]);
+
+			tidx.barrier.wait();
+
+			for (auto k = 0; k < TileSize; k++)
+			{
+				sum += sA[row][k] * sB[k][col];
+			}
+
+			tidx.barrier.wait();
 		}
 
-		ar_res[tidx] = sum;
+		ar_res[tidx.global] = sum;
 	});
 #ifdef SYNC
 	ar_res.synchronize();
-#endif
+#endif	
 }
 
 template<class type_t>
