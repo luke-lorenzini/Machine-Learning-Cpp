@@ -13,9 +13,8 @@
 #include "tanh_neuron.h"
 
 //#define _USE_PARALLEL
-//#define _USE_SOFTMAX
 
-	nnet::nnet(input_parms &parms)
+nnet::nnet(input_parms &parms)
 {
 	OUTPUT_CLASSES = parms.output_classes;
 	IN_SIZE = parms.in_size;
@@ -51,7 +50,7 @@ void nnet::run_sequential(input_data &data)
 	logistic_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
 	//logistic_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
 	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
-	logistic_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
+	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
 
 	neurons.push_back(&neuron_in);
 	//neurons.push_back(&neuron_int0);
@@ -147,10 +146,7 @@ void nnet::run_sequential(input_data &data)
 			{
 				neurons[neur_it]->fwd(neurons[neur_it - 1]->get_ar_y());
 			}
-#ifdef  _USE_SOFTMAX
-			/* Softmax */
-			neurons[neuron_count - 1]->softmax();
-#endif //  _USE_SOFTMAX
+
 			/* Error */
 			nnet_math<type_t>::matrix_sub(neurons[neuron_count - 1]->get_ar_y(), ar_t, ar_error_out);
 			if ((epochs % ((EPOCHS) / 10) == 0) && (samples == 0))
@@ -169,16 +165,9 @@ void nnet::run_sequential(input_data &data)
 
 				error_den = 0;
 			}
-#ifdef _USE_SOFTMAX
-			/* Softmax Derivative */
-			neurons[neuron_count - 1]->softmax_der();
 
 			/* Back Propogation Step */
-			neurons[neuron_count - 1]->bkwd(neurons[neuron_count - 1]->get_softmax_err());
-#else
-			/* Back Propogation Step */
 			neurons[neuron_count - 1]->bkwd(ar_error_out);
-#endif // _USE_SOFTMAX
 			neurons[neuron_count - 1]->set_error();
 			for (auto neur_it = neuron_count - 2; neur_it >= 0; --neur_it)
 			{
@@ -418,3 +407,4 @@ void nnet::verify(input_data& data)
 	neurons[1]->check(neurons[0]->get_ar_y());
 	nnet_math<type_t>::matrix_sub(neurons[1]->get_ar_y(), t_check2, error_check2);
 }
+
