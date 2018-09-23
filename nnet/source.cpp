@@ -86,19 +86,19 @@ int main()
 	myParms.epochs = EPOCHS;
 
 	/* Input Data */
-	nnet::input_data myData2;
-	myData2.x = x;
-	myData2.t = t;
-	myData2.size = sample_size;
+	nnet::input_data myData;
+	myData.x = x;
+	myData.t = t;
+	myData.size = sample_size;
 
 	/* Create the nnet object */
 	nnet id(myParms);
 
 	/* Run the thing in sequential mode */
-	id.run_sequential(myData2);
+	id.run_sequential(myData);
 
 	/* Run the thing in parallel mode */
-	//id.run_parallel(myData2);
+	//id.run_parallel(myData);
 
 	/* Verify the thing */
 	//id.verify(myData2);
