@@ -23,6 +23,7 @@ public:
 	void accm(concurrency::array_view<type_t, RANK> &ar_x);
 
 	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_y();
+	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_z();
 	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_delta();
 	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_W();
 	concurrency::array_view<type_t, neuron<type_t>::RANK> &get_ar_error();
@@ -278,6 +279,12 @@ template <class type_t>
 concurrency::array_view<type_t, neuron<type_t>::RANK> &neuron<type_t>::get_ar_y()
 {
 	return ar_y;
+}
+
+template <class type_t>
+concurrency::array_view<type_t, neuron<type_t>::RANK> &neuron<type_t>::get_ar_z()
+{
+	return ar_z;
 }
 
 template <class type_t>
