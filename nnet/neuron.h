@@ -250,6 +250,8 @@ void neuron<type_t>::updt(int samples)
 
 	/* Update alpha */
 	updateAlpha();
+
+	nnet_math<type_t>::scalar_mult(ar_delta_W, 0, ar_delta_W);
 }
 
 template <class type_t>
