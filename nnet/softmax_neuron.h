@@ -58,7 +58,7 @@ void softmax_neuron<type_t>::activate_der()
 		{
 			if (i == j)
 			{
-				Jacobian.push_back(y[i] * (1 - y[i]));
+				Jacobian.push_back(y[i] * (1 - y[j]));
 			}
 			else
 			{
