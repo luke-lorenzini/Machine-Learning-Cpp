@@ -43,10 +43,10 @@ void nnet::run_sequential(input_data &data)
 	std::vector<type_t> error_out(error_out_size, 0);
 	concurrency::array_view<type_t, 2> ar_error_out(error_out_rows, error_out_cols, error_out);
 
-	logistic_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
-	//logistic_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
+	relu_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
+	//relu_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
 	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
-	logistic_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
+	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
 
 	neurons.push_back(&neuron_in);
 	//neurons.push_back(&neuron_int0);
@@ -73,6 +73,7 @@ void nnet::run_sequential(input_data &data)
 
 			/* Error */
 			nnet_math<type_t>::matrix_sub(neurons[neuron_count - 1]->get_ar_y(), ar_t, ar_error_out);
+			nnet_math<type_t>::scalar_div(ar_error_out, data.size, ar_error_out);
 			if ((epochs % ((EPOCHS) / 10) == 0) && (samples == 0))
 			{
 				auto val = 100 * epochs / (double)EPOCHS;
@@ -158,13 +159,15 @@ void nnet::run_parallel(input_data &data)
 	auto error_den = 1.0;
 	auto total_error = 1.0;
 
+	gpu::getAccels();
+
 	std::vector<type_t> error_out(error_out_size, 0);
 	concurrency::array_view<type_t, 2> ar_error_out(error_out_rows, error_out_cols, error_out);
 
-	logistic_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
-	//logistic_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
-	//logistic_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
-	logistic_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
+	relu_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
+	//relu_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
+	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
+	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
 
 	neurons.push_back(&neuron_in);
 	//neurons.push_back(&neuron_int0);
@@ -207,6 +210,7 @@ void nnet::run_parallel(input_data &data)
 
 				/* Error */
 				nnet_math<type_t>::matrix_sub(neurons[neuron_count - 1]->get_ar_y(), test_t, ar_error_out);
+				nnet_math<type_t>::scalar_div(ar_error_out, data.size, ar_error_out);
 				/*if ((epochs % ((EPOCHS) / 10) == 0) && (i == 0))
 				{
 					auto val = 100 * epochs / (double)EPOCHS;

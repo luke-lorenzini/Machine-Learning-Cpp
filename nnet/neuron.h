@@ -244,8 +244,7 @@ void neuron<type_t>::accm(concurrency::array_view<type_t, RANK> &ar_x)
 template <class type_t>
 void neuron<type_t>::updt(int samples)
 {
-	nnet_math<type_t>::scalar_div(ar_delta_W, samples, ar_t_delta_W);
-	nnet_math<type_t>::scalar_mult(ar_t_delta_W, alpha, ar_t_delta_W);
+	nnet_math<type_t>::scalar_mult(ar_delta_W, alpha, ar_t_delta_W);
 	nnet_math<type_t>::matrix_sub(ar_W, ar_t_delta_W, ar_W);
 
 	/* Update alpha */

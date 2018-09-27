@@ -5,7 +5,6 @@
 *.ipch
 *.enc
 *.opendb
-*.csv
 *.txt
 *.json
 *.sqlite
@@ -15,3 +14,6 @@
 /nnet/x64/Debug
 /.vs/nnet
 *.user
+/.vs/Machine-Learning-Cpp/v15
+/test_data/iris
+/test_data/MNIST
