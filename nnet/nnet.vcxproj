@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClInclude Include="file.h" />
     <ClInclude Include="gpu.h" />
+    <ClInclude Include="layer_tanh.h" />
     <ClInclude Include="logistic_neuron.h" />
     <ClInclude Include="neuron.h" />
     <ClInclude Include="nnet.h" />
@@ -136,7 +137,6 @@
     <ClInclude Include="softmax_neuron.h" />
     <ClInclude Include="relu_neuron.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="tanh_neuron.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

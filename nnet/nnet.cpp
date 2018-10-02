@@ -10,7 +10,7 @@
 #include "nnet_math.h"
 #include "softmax_neuron.h"
 #include "relu_neuron.h"
-#include "tanh_neuron.h"
+#include "layer_tanh.h"
 
 nnet::nnet(input_parms &parms)
 {

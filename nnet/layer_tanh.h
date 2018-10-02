@@ -6,12 +6,12 @@
 #include "neuron.h"
 
 template <class type_t>
-class tanh_neuron :
+class layer_tanh :
 	public neuron<type_t>
 {
 public:
-	tanh_neuron(int input, int output);
-	~tanh_neuron();
+	layer_tanh(int input, int output);
+	~layer_tanh();
 
 protected:
 	void activate() override;
@@ -20,24 +20,24 @@ protected:
 };
 
 template <class type_t>
-tanh_neuron<type_t>::tanh_neuron(int input, int output) :
+layer_tanh<type_t>::layer_tanh(int input, int output) :
 	neuron(input, output)
 {
 }
 
 template <class type_t>
-tanh_neuron<type_t>::~tanh_neuron()
+layer_tanh<type_t>::~layer_tanh()
 {
 }
 
 template <class type_t>
-void tanh_neuron<type_t>::activate()
+void layer_tanh<type_t>::activate()
 {
 	nnet_math<type_t>::tanh(ar_z, ar_y);
 }
 
 template <class type_t>
-void tanh_neuron<type_t>::activate_der()
+void layer_tanh<type_t>::activate_der()
 {
 	nnet_math<type_t>::matrix_prod(ar_y, ar_y, ar_t_y);
 
@@ -45,7 +45,7 @@ void tanh_neuron<type_t>::activate_der()
 }
 
 template <class type_t>
-void tanh_neuron<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
+void layer_tanh<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
 {
 #ifdef _USE_FIXED_RAND
 	/* Always generate the same random numbers */
