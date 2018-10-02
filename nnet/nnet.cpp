@@ -9,7 +9,7 @@
 #include "nnet.h"
 #include "nnet_math.h"
 #include "softmax_neuron.h"
-#include "relu_neuron.h"
+#include "layer_relu.h"
 #include "layer_tanh.h"
 
 nnet::nnet(input_parms &parms)
@@ -43,7 +43,7 @@ void nnet::run_sequential(input_data &data)
 	std::vector<type_t> error_out(error_out_size, 0);
 	concurrency::array_view<type_t, 2> ar_error_out(error_out_rows, error_out_cols, error_out);
 
-	relu_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
+	layer_relu<type_t> neuron_in(OUT_SIZE, IN_SIZE);
 	//relu_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
 	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
 	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
@@ -164,7 +164,7 @@ void nnet::run_parallel(input_data &data)
 	std::vector<type_t> error_out(error_out_size, 0);
 	concurrency::array_view<type_t, 2> ar_error_out(error_out_rows, error_out_cols, error_out);
 
-	relu_neuron<type_t> neuron_in(OUT_SIZE, IN_SIZE);
+	layer_relu<type_t> neuron_in(OUT_SIZE, IN_SIZE);
 	//relu_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
 	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
 	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);

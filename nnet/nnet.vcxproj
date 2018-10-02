@@ -135,7 +135,7 @@
     <ClInclude Include="nnet.h" />
     <ClInclude Include="nnet_math.h" />
     <ClInclude Include="softmax_neuron.h" />
-    <ClInclude Include="relu_neuron.h" />
+    <ClInclude Include="layer_relu.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
