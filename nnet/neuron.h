@@ -91,12 +91,17 @@ protected:
 	int delta_cols;
 	std::vector<type_t> delta;
 
+	int bias_rows;
+	int bias_cols;
+	std::vector<type_t> bias;
+
 	int t_delta_out_rows;
 	int t_delta_out_cols;
 	std::vector<type_t> t_delta_out;
 
 	concurrency::array_view<type_t, RANK> ar_y;
 	concurrency::array_view<type_t, RANK> ar_delta;
+	concurrency::array_view<type_t, RANK> ar_bias;
 	concurrency::array_view<type_t, RANK> ar_W;
 	concurrency::array_view<type_t, RANK> ar_error;
 	concurrency::array_view<type_t, RANK> ar_z;
@@ -129,6 +134,7 @@ template <class type_t>
 neuron<type_t>::neuron(int input, int output) :
 	y(input * COLS, 0),
 	delta(input * COLS, 0),
+	bias(input * COLS, 0),
 	W(input * output, 1),
 	error(output * COLS, 0),
 	z(input * COLS, 0),
@@ -143,6 +149,7 @@ neuron<type_t>::neuron(int input, int output) :
 
 	ar_y(input, COLS, y),
 	ar_delta(input, COLS, delta),
+	ar_bias(input, COLS, bias),
 	ar_W(input, output, W),
 	ar_error(output, COLS, error),
 	ar_z(input, COLS, z),
@@ -216,6 +223,8 @@ void neuron<type_t>::fwd(concurrency::array_view<type_t, RANK> &ar_x)
 #else
 	nnet_math<type_t>::matrix_mult(ar_W, ar_x, ar_z);
 #endif
+
+	nnet_math<type_t>::matrix_add(ar_z, ar_bias, ar_z);
 
 	activate();
 }
