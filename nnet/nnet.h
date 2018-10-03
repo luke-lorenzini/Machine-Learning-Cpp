@@ -46,6 +46,6 @@ private:
 	int t_rows = OUTPUT_CLASSES;
 	int t_cols = COLS;
 
-	std::vector<neuron<type_t>*> neurons;
+	std::vector<neuron<type_t>*> layers;
 };
 
