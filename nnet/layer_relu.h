@@ -6,12 +6,12 @@
 #include "neuron.h"
 
 template <class type_t>
-class layer_relu :
+class relu :
 	public neuron<type_t>
 {
 public:
-	layer_relu(int input, int output);
-	~layer_relu();
+	relu(int input, int output);
+	~relu();
 
 protected:
 	void activate() override;
@@ -20,30 +20,30 @@ protected:
 };
 
 template <class type_t>
-layer_relu<type_t>::layer_relu(int input, int output) :
+relu<type_t>::relu(int input, int output) :
 	neuron(input, output)
 {
 }
 
 template <class type_t>
-layer_relu<type_t>::~layer_relu()
+relu<type_t>::~relu()
 {
 }
 
 template <class type_t>
-void layer_relu<type_t>::activate()
+void relu<type_t>::activate()
 {
 	nnet_math<type_t>::relu(ar_z, ar_y);
 }
 
 template <class type_t>
-void layer_relu<type_t>::activate_der()
+void relu<type_t>::activate_der()
 {
 	nnet_math<type_t>::relu_der(ar_z, ar_t_e0);
 }
 
 template <class type_t>
-void layer_relu<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
+void relu<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
 {
 #ifdef _USE_FIXED_RAND
 	/* Always generate the same random numbers */

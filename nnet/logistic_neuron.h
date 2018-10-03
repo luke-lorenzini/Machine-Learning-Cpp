@@ -6,12 +6,12 @@
 #include "neuron.h"
 
 template <class type_t>
-class logistic_neuron :
+class logistic :
 	public neuron<type_t>
 {
 public:
-	logistic_neuron(int input, int output);
-	~logistic_neuron();
+	logistic(int input, int output);
+	~logistic();
 
 protected:
 	void activate() override;
@@ -20,24 +20,24 @@ protected:
 };
 
 template <class type_t>
-logistic_neuron<type_t>::logistic_neuron(int input, int output) :
+logistic<type_t>::logistic(int input, int output) :
 	neuron(input, output)
 {
 }
 
 template <class type_t>
-logistic_neuron<type_t>::~logistic_neuron()
+logistic<type_t>::~logistic()
 {
 }
 
 template <class type_t>
-void logistic_neuron<type_t>::activate()
+void logistic<type_t>::activate()
 {
 	nnet_math<type_t>::logistic(ar_z, ar_y);
 }
 
 template <class type_t>
-void logistic_neuron<type_t>::activate_der()
+void logistic<type_t>::activate_der()
 {
 	nnet_math<type_t>::matrix_sub(ar_ones, ar_y, ar_t_y);
 
@@ -45,7 +45,7 @@ void logistic_neuron<type_t>::activate_der()
 }
 
 template <class type_t>
-void logistic_neuron<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
+void logistic<type_t>::init_rand_real(int size, std::vector<type_t> &vect)
 {
 #ifdef _USE_FIXED_RAND
 	/* Always generate the same random numbers */
