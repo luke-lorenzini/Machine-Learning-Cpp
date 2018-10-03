@@ -253,12 +253,18 @@ void neuron<type_t>::accm(concurrency::array_view<type_t, RANK> &ar_x)
 template <class type_t>
 void neuron<type_t>::updt(int samples)
 {
+	// Update weights
 	nnet_math<type_t>::scalar_mult(ar_delta_W, alpha, ar_t_delta_W);
 	nnet_math<type_t>::matrix_sub(ar_W, ar_t_delta_W, ar_W);
+
+	// Update biases
+	nnet_math<type_t>::scalar_mult(ar_delta, alpha, ar_delta);
+	nnet_math<type_t>::matrix_sub(ar_bias, ar_delta, ar_bias);
 
 	/* Update alpha */
 	updateAlpha();
 
+	// Reset weights
 	nnet_math<type_t>::scalar_mult(ar_delta_W, 0, ar_delta_W);
 }
 
@@ -266,6 +272,7 @@ template <class type_t>
 void neuron<type_t>::set_error()
 {
 	nnet_math<type_t>::matrix_trans(ar_W, ar_W_Trans);
+	// Consider ar_delta to be delta_bias
 #ifdef _USE_TILES
 	nnet_math<type_t>::matrix_mult_tile(ar_W_Trans, ar_delta, ar_error);
 #else
