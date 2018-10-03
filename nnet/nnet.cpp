@@ -46,7 +46,7 @@ void nnet::run_sequential(input_data &data)
 	layer_relu<type_t> neuron_in(OUT_SIZE, IN_SIZE);
 	//relu_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
 	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
-	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
+	softmax<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
 
 	neurons.push_back(&neuron_in);
 	//neurons.push_back(&neuron_int0);
@@ -167,7 +167,7 @@ void nnet::run_parallel(input_data &data)
 	layer_relu<type_t> neuron_in(OUT_SIZE, IN_SIZE);
 	//relu_neuron<type_t> neuron_int0(OUT_SIZE, OUT_SIZE);
 	//relu_neuron<type_t> neuron_int1(OUT_SIZE, OUT_SIZE);
-	softmax_neuron<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
+	softmax<type_t> neuron_out(OUTPUT_CLASSES, OUT_SIZE);
 
 	neurons.push_back(&neuron_in);
 	//neurons.push_back(&neuron_int0);

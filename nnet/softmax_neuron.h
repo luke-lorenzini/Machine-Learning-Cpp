@@ -6,12 +6,12 @@
 #include "neuron.h"
 
 template <class type_t>
-class softmax_neuron :
+class softmax :
 	public neuron<type_t>
 {
 public:
-	softmax_neuron(int input, int output);
-	~softmax_neuron();
+	softmax(int input, int output);
+	~softmax();
 
 protected:
 	void activate() override;
@@ -19,18 +19,18 @@ protected:
 };
 
 template <class type_t>
-softmax_neuron<type_t>::softmax_neuron(int input, int output) :
+softmax<type_t>::softmax(int input, int output) :
 	neuron(input, output)
 {
 }
 
 template <class type_t>
-softmax_neuron<type_t>::~softmax_neuron()
+softmax<type_t>::~softmax()
 {
 }
 
 template <class type_t>
-void softmax_neuron<type_t>::activate()
+void softmax<type_t>::activate()
 {
 	// Extract the maxium value and convert to type type_t
 	auto maxi = std::max_element(std::begin(z), std::end(z));
@@ -44,7 +44,7 @@ void softmax_neuron<type_t>::activate()
 }
 
 template <class type_t>
-void softmax_neuron<type_t>::activate_der()
+void softmax<type_t>::activate_der()
 {
 #if 0
 	/*
