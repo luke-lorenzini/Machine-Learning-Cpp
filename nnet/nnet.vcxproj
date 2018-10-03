@@ -130,12 +130,12 @@
     <ClInclude Include="file.h" />
     <ClInclude Include="gpu.h" />
     <ClInclude Include="layer_tanh.h" />
-    <ClInclude Include="logistic_neuron.h" />
+    <ClInclude Include="logistic.h" />
     <ClInclude Include="neuron.h" />
     <ClInclude Include="nnet.h" />
     <ClInclude Include="nnet_math.h" />
-    <ClInclude Include="softmax_neuron.h" />
-    <ClInclude Include="layer_relu.h" />
+    <ClInclude Include="softmax.h" />
+    <ClInclude Include="relu.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
