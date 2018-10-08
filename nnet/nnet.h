@@ -48,4 +48,3 @@ private:
 
 	std::vector<neuron<type_t>*> layers;
 };
-

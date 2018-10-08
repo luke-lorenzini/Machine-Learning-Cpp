@@ -1,3 +1,6 @@
+# run the following command
+# pip install --user .
+
 from distutils.core import setup, Extension, DEBUG
 
 sfc_module = Extension('nnet', sources = ['source.cpp', 'nnet.cpp', 'gpu.cpp'])
